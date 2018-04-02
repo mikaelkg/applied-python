@@ -2,6 +2,24 @@
 import collections
 import re
 import datetime
+def get_time(string):
+    try:
+        request_date=re.search(r'^\[(?P<time>.*)\]', string)
+        return datetime.datetime.strptime(request_date.group('time'), "%d/%b/%Y %H:%M:%S")
+    except:
+        return None
+def get_code_and_time(string):
+    result=re.search(r'(?P<response_code>\d+) (?P<response_time>\d+)$',string)
+    if result:
+        return result.groups()
+    else:
+        return (None,None)
+def get_params(string):
+    result=re.search(r'"(\w+) (.+) (.+)"', string)
+    if result:
+        return result.groups()
+    else:
+        return (None,None,None)
 def parse(
     ignore_files=False,
     ignore_urls=[],
@@ -14,24 +32,7 @@ def parse(
 
     counts=collections.Counter()
     times=collections.Counter()
-    def get_time(string):
-        try:
-            request_date=re.search(r'^\[(?P<time>.*)\]', string)
-            return datetime.datetime.strptime(request_date.group('time'), "%d/%b/%Y %H:%M:%S")
-        except:
-            return None
-    def get_code_and_time(string):
-        result=re.search(r'(?P<response_code>\d+) (?P<response_time>\d+)$',string)
-        if result:
-            return result.groups()
-        else:
-            return (None,None)
-    def get_params(string):
-        result=re.search(r'"(\w+) (.+) (.+)"', string)
-        if result:
-            return result.groups()
-        else:
-            return (None,None,None)
+
         
     file = open('log.log','r')
     text=file.readlines()
