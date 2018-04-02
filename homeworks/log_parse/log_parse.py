@@ -15,13 +15,10 @@ def parse(
     counts=collections.Counter()
     times=collections.Counter()
     def get_time(string):
-        months={"Jan":1,"Feb":2,'Mar':3,"Apr":4,'May':5,'Jun':6,'Jul':7,'Aug':8,"Sep":9,"Oct":10,'Nov':11,'Dec':12}
-        request_date=re.search(r'(?P<day>\d+)/(?P<month>\w+)/(?P<year>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<second>\d+)',string)
-        if request_date:
-            request_date=datetime.datetime(int(request_date.group('year')),months[request_date.group('month')],int(request_date.group('day')),int(request_date.group('hour')),
-                                 int(request_date.group('minute')),int(request_date.group('second')))
-            return request_date
-        else:
+        try:
+            request_date=re.search(r'^\[(?P<time>.*)\]', string)
+            return datetime.datetime.strptime(request_date.group('time'), "%d/%b/%Y %H:%M:%S")
+        except:
             return None
     def get_code_and_time(string):
         result=re.search(r'(?P<response_code>\d+) (?P<response_time>\d+)$',string)
@@ -50,8 +47,8 @@ def parse(
         if request:
             scheme,host,path,query,fragment=re.search(r'(?P<scheme>\w+)://(?P<host>[^/]*)(?P<path>[^?]+)*(?P<query>\?[^#]+)*(?P<fragment>#\w+)*',request).groups()
             if ignore_files:
-                if '.' in path:
-                    ingnore=True
+                if re.search(r'\.(\w+)$', path) and query is None and fragment is None:
+                    ignore=True
             if request_type:
                 if request_type != requesttype:
                     ignore=True
