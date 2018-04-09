@@ -32,19 +32,19 @@ class HitsMatch:
             if success:
                 self._players_points[self._current_player]['points'] += 1
                 self._players_points[self._current_player]['hit'] = True
-                self.update_table()
+                self._update_table()
             else:
                 self._players_points[self._current_player]['points'] += 1
                 if self._players_points[self._current_player]['points'] == 9:
                     self._players_points[self._current_player]['points'] += 1
                     self._players_points[self._current_player]['hit'] = True
-                    self.update_table()
-            self._current_player = self.next_player()
+                    self._update_table()
+            self._current_player = self._next_player()
         else:
             raise RuntimeError
     def get_table(self):
         return self._table
-    def next_player(self):
+    def _next_player(self):
         for i in range(1, len(self.players)+1):
             if not self._players_points[(self._current_player + i) % len(self.players)]['hit']:
                 return (self._current_player + i) % len(self.players)
@@ -54,7 +54,7 @@ class HitsMatch:
         if self._current_H == self.H + 1:
             self.finished = True
         return self._current_H - 1
-    def update_table(self):
+    def _update_table(self):
         buf = list(self._table[self._current_H])
         for i,player_point in enumerate(self._players_points):
             if player_point['hit']:
@@ -86,25 +86,25 @@ class HolesMatch(HitsMatch):
             if success:
                 self._players_points[self._current_player]['hit'] = True
                 self._players_points[self._current_player]['points'] = 1
-                self.update_table()
+                self._update_table()
 
-            self._current_player = self.next_player()
+            self._current_player = self._next_player()
         else:
             raise RuntimeError
-    def any_win(self):
+    def _any_win(self):
         for player in self._players_points:
             if player['hit']:
                 return True
         return False
-    def set_hit(self):
+    def _set_hit(self):
         for i,j in enumerate(self._players_points):
             self._players_points[i]['hit'] = True
-    def next_player(self):
+    def _next_player(self):
         self.cycle += 1 
-        if (self.any_win() or self.cycles == 10) and (self.cycle == len(self.players)):
+        if (self._any_win() or self.cycles == 10) and (self.cycle == len(self.players)):
         
-            self.set_hit()
-            self.update_table()
+            self._set_hit()
+            self._update_table()
   
             self._current_H += 1
             self._players_points = [{'points' : 0,'hit' : False} for player in self.players]
